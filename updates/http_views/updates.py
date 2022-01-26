@@ -4,14 +4,16 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib.auth import login, logout
 from django.views.decorators.csrf import csrf_exempt
-from common.views import BaseView, get_hashed_password
+from common.views import BaseView, get_hashed_password, require_auth
 from updates.models import Update
 from userauth.models import User
 
 
 class UpdateView(BaseView):
+    @require_auth
     def post(self, request):
         print("test create post")
+        print(request)
         json_data = json.loads(request.body)
         user_detail = User.objects.filter(user_id = json_data["user"]).first()
         

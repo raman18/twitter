@@ -1,9 +1,16 @@
+import logging
+from django.utils import timezone
+import datetime
 from django.shortcuts import render
 # import bcrypt
 import json
 from django.http import HttpRequest, HttpResponse
+from common.i18n import translate as _
 from django.views.generic import View
 
+from userauth.model.access_token_model import AccessToken
+
+logger = logging.getLogger(__name__)
 class BaseView(View):
     def http_method_not_allowed(self, request, *args, **kwargs):
         status = {}
@@ -23,8 +30,7 @@ class BaseView(View):
         headers=None,
         code=200,
         message="OK",
-        # localized_message=_("DONE"),
-        localized_message = "DONE",
+        localized_message=_("DONE"),
         success=True,
     ):
         status = {}
@@ -48,5 +54,46 @@ def get_hashed_password(plain_text_password):
     return bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
 
 def check_password(plain_text_password, hashed_password):
-    return "bcrypt"
+    if plain_text_password == "bcrypt":
+        return False
+    else:
+        return True
     return bcrypt.checkpw(plain_text_password, hashed_password)
+
+def require_auth(func):
+    def debug(request):
+        if "authorization" not in request.headers:
+            logger.warning("Authorization header is not present.")
+            return
+
+        auth_header = request.headers["authorization"]
+        if not auth_header.startswith("Bearer "):
+            logger.warning(
+                "Authorization header is present but invalid. Header Value=%s",
+                auth_header,
+            )
+            return
+
+    def checker(*args, **kwargs):
+        print("values are ")
+        print(*args, **kwargs)
+        request = args[1]
+        print("request is ")
+        print(request)
+        print(request.headers.get('authorization'))
+        access_token = request.headers.get('authorization').split(' ')[-1]
+        access_token = AccessToken.objects.filter(access_token = access_token).first()
+        print(access_token)
+        if not access_token or access_token.expires_at < timezone.now():
+            logger.warning("User is not authenticated")
+            debug(request)
+            return BaseView.build_response(
+                None,
+                code=401,
+                message="Not Authorized",
+                localized_message=_("REQUIRES_LOGIN"),
+                success=False,
+            )
+        return func(*args, **kwargs)
+
+    return checker

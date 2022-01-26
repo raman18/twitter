@@ -1,27 +1,29 @@
 from logging import Logger
+import json
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.contrib.auth import login, logout
-from common.views import BaseView, check_password
+from common.views import BaseView, check_password, require_auth
 from userauth.models import User
 
 
 class LoginLogout(BaseView):
-    @csrf_exempt
-    def post(request):
-        print(request.body)
-        user = User()
-        user_exists = user.objects.filter(username=request.body.username)
+    @require_auth
+    def post(self, request):
+        json_data = json.loads(request.body)
+    
+        user_exists = User.objects.filter(username=json_data["username"]).first()
+        print("user password is")
         if not user_exists:
-            return HttpResponse("You are not registered with us.")
+            return HttpResponse("Username is wrong.")
         else:
-            if check_password(request.body.email.password, user_exists.password):
-                login(request, user)
+            if check_password(json_data["password"], user_exists.password):
                 return HttpResponse("User is authorized.")
-        return HttpResponse("You can register user here.")
+            else:
+                return HttpResponse("Password is wrong.")
 
-    @csrf_exempt
+    @require_auth
     def delete(request):
         logout(request)
         Logger.info(request, "Logged out successfully!")

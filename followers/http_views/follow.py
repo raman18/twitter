@@ -5,13 +5,15 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from userauth.models import User
 from followers.models import Followers
-from common.views import BaseView
+from common.views import BaseView, require_auth
 
 
 class FollowView(BaseView):
+    @require_auth
     def post(self, request):
         json_data = json.loads(request.body)
-    
+        print("user in follow user request is")
+        print(request)
         if json_data["user"] == json_data["followee"]:
             return HttpResponse("Insufficient data.")
         
