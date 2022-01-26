@@ -1,0 +1,2 @@
+from userauth.http_views.register_user import RegisterUser
+from userauth.http_views.login_logout import LoginLogout
