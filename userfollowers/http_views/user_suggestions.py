@@ -12,7 +12,6 @@ class UserSuggestionView(BaseView):
     def get(self,request):
         print("suggest user ")
         print(request.user.user_id)
-        request.user.user_id = 1
         print(request.token)
         inner_qs = UserFollower.objects.filter(user = request.user.user_id).values('follower')
         suggestions = User.objects.exclude(user_id__in=inner_qs).all()
@@ -26,7 +25,7 @@ class UserSuggestionView(BaseView):
             for user in suggestions.iterator():
                 if user.user_id == request.user.user_id:
                     continue
-                result.append({user.user_id: user.name})
+                result.append({"user_id" :user.user_id, "name": user.name})
             return self.build_response(
                 result,
                 code=200,

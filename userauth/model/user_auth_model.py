@@ -9,5 +9,4 @@ class User(models.Model):
     email = models.CharField(max_length=50)
     username = models.CharField(max_length=20)
     password = models.TextField(max_length=70)
-    text = models.CharField(max_length=160)
     created_at = models.DateTimeField(auto_now_add=True)

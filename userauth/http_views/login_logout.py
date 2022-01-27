@@ -1,8 +1,11 @@
 import logging
 import json
+from datetime import datetime
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from pytz import timezone
+import pytz
 from common.i18n import translate as _
 from django.contrib.auth import login, logout
 from common.views import BaseView, check_password, get_hashed_password, require_auth
@@ -50,7 +53,8 @@ class LoginLogout(BaseView):
     def delete(self, request):
         logger.info("Handling logout call.")
         if request.token:
-            request.token.delete()
+            request.token.expires_at = datetime.now(pytz.utc)
+            request.token.save()
 
         return self.build_response(
             None, 

@@ -31,12 +31,12 @@ class UserFeedsView(BaseView):
                 localized_message=_("NOT_FOLLOWING_ANYONE"),
             )
 
-        timelines = UserPost.objects.filter(user__in = users).only('post_id','content',).order_by('-post_id').all()
+        timeline = UserPost.objects.filter(user__in = users).only('post_id','content',).order_by('-created_at').all()
         
-        if timelines:
+        if timeline:
             result = []
-            for feeds in timelines.iterator():
-                result.append({feeds['post_id'] : feeds['content']})
+            for feed in timeline.iterator():
+                result.append({"name": feed.user.name, "created_at": str(feed.created_at), "post_id": feed.post_id, "content" : feed.content})
 
             return self.build_response(
                 result,

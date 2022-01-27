@@ -1,7 +1,5 @@
 import logging
-from django.utils import timezone
-import datetime
-from django.shortcuts import render
+from django.utils import timezone 
 import bcrypt
 import json
 from django.http import HttpRequest, HttpResponse
@@ -73,12 +71,8 @@ def require_auth(func):
             return
 
     def checker(*args, **kwargs):
-        print(*args, **kwargs)
         request = args[1]
-        print("request is ")
-        print(request)
-        print(request.headers.get('authorization'))
-        access_token = request.headers.get('authorization').split(' ')[-1]
+        access_token = request.headers.get('Authorization').split(' ')[-1]
         access_token = AccessToken.objects.filter(access_token = access_token).select_related("user").first()
         if not access_token:
             logger.warning("Access Token not found.")
@@ -90,7 +84,7 @@ def require_auth(func):
                 localized_message=_("REQUIRES_LOGIN"),
                 success=False,
             )
-        elif access_token and access_token.expires_at < timezone.now():
+        elif access_token and access_token.expired():
             logger.warning("Access Token is expired.")
             debug(request)
             return BaseView.build_response(
