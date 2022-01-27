@@ -1,0 +1,1 @@
+from .model.user_post_model import UserPost

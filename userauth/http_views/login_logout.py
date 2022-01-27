@@ -1,30 +1,60 @@
-from logging import Logger
+import logging
 import json
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from common.i18n import translate as _
 from django.contrib.auth import login, logout
-from common.views import BaseView, check_password, require_auth
+from common.views import BaseView, check_password, get_hashed_password, require_auth
+from userauth.model.access_token_model import AccessToken
 from userauth.models import User
 
+logger = logging.getLogger(__name__)
 
 class LoginLogout(BaseView):
-    @require_auth
+    
     def post(self, request):
+        logger.info("Handling login call.")
         json_data = json.loads(request.body)
     
-        user_exists = User.objects.filter(username=json_data["username"]).first()
-        print("user password is")
-        if not user_exists:
-            return HttpResponse("Username is wrong.")
+        user = User.objects.filter(username=json_data["username"]).first()
+        if not user:
+            return self.build_response(
+                None,
+                code=201,
+                message="Wrong username",
+                localized_message=_("USERNAME_NOT_FOUND"),
+            )
         else:
-            if check_password(json_data["password"], user_exists.password):
-                return HttpResponse("User is authorized.")
+            if check_password(json_data["password"].encode("utf-8"), user.password.encode("utf-8")):
+                user_access_token = AccessToken()
+                user_access_token.user = user
+                user_access_token.access_token = AccessToken.generate()
+                user_access_token.save()
+                result = [{"access_token": user_access_token.access_token}]
+                return self.build_response(
+                    result,
+                    code=200,
+                    message="User logged in.",
+                    localized_message=_("LOGIN_OK"),
+                )
             else:
-                return HttpResponse("Password is wrong.")
+                return self.build_response(
+                    None,
+                    code=422,
+                    message="Entered wrong password.",
+                    localized_message=_("WRONG_LOGIN_PASSWORD"),
+                )
 
     @require_auth
-    def delete(request):
-        logout(request)
-        Logger.info(request, "Logged out successfully!")
-        return redirect("main:homepage")
+    def delete(self, request):
+        logger.info("Handling logout call.")
+        if request.token:
+            request.token.delete()
+
+        return self.build_response(
+            None, 
+            code=200, 
+            message="OK", 
+            localized_message=_("LOGOUT_OK")
+        )

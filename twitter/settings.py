@@ -31,10 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'userauth',
     'common',
-    'updates',
-    'followers',
+    'userauth',
+    'userposts',
+    'userfollowers',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'twitter.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'djangodatabase',
+        'NAME': 'djangoapp',
         'USER': 'dbadmin',
         'PASSWORD': 'Crowdfire18',
         'HOST': 'localhost',

@@ -2,7 +2,7 @@ import logging
 from django.utils import timezone
 import datetime
 from django.shortcuts import render
-# import bcrypt
+import bcrypt
 import json
 from django.http import HttpRequest, HttpResponse
 from common.i18n import translate as _
@@ -50,14 +50,12 @@ class BaseView(View):
         return response
 
 def get_hashed_password(plain_text_password):
-    return "bcrypt"
+    salt = bcrypt.gensalt()
+    password_hashed = bcrypt.hashpw(plain_text_password, salt)
+    return password_hashed
     return bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
 
 def check_password(plain_text_password, hashed_password):
-    if plain_text_password == "bcrypt":
-        return False
-    else:
-        return True
     return bcrypt.checkpw(plain_text_password, hashed_password)
 
 def require_auth(func):
@@ -75,17 +73,15 @@ def require_auth(func):
             return
 
     def checker(*args, **kwargs):
-        print("values are ")
         print(*args, **kwargs)
         request = args[1]
         print("request is ")
         print(request)
         print(request.headers.get('authorization'))
         access_token = request.headers.get('authorization').split(' ')[-1]
-        access_token = AccessToken.objects.filter(access_token = access_token).first()
-        print(access_token)
-        if not access_token or access_token.expires_at < timezone.now():
-            logger.warning("User is not authenticated")
+        access_token = AccessToken.objects.filter(access_token = access_token).select_related("user").first()
+        if not access_token:
+            logger.warning("Access Token not found.")
             debug(request)
             return BaseView.build_response(
                 None,
@@ -94,6 +90,19 @@ def require_auth(func):
                 localized_message=_("REQUIRES_LOGIN"),
                 success=False,
             )
+        elif access_token and access_token.expires_at < timezone.now():
+            logger.warning("Access Token is expired.")
+            debug(request)
+            return BaseView.build_response(
+                None,
+                code=401,
+                message="Token Expired",
+                localized_message=_("ACCESS_TOKEN_EXPIRED"),
+                success=False,
+            )
+        else:
+            request.user = access_token.user
+            request.token = access_token
         return func(*args, **kwargs)
 
     return checker
