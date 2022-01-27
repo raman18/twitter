@@ -13,11 +13,7 @@ from userauth.models import User
 class UserPostView(BaseView):
     @require_auth
     def post(self, request):
-        print("test create post request is")
-        print(request.user.name)
-        print(request.user.user_id)
         json_data = json.loads(request.body)
-        print(json_data)
         
         if(len(json_data["content"]) == 0):
             return self.build_response(

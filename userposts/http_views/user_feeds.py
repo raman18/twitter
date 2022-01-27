@@ -15,10 +15,7 @@ from userauth.models import User
 class UserFeedsView(BaseView):
     @require_auth
     def get(self, request):
-        print("Get Feeds")
         user_followers = UserFollower.objects.filter(user = request.user).only('follower')
-        print("user followers are")
-        print(user_followers)
         if user_followers:
             users = []
             for user in user_followers.iterator():

@@ -10,15 +10,9 @@ from common.views import BaseView, require_auth
 class UserSuggestionView(BaseView):
     @require_auth
     def get(self,request):
-        print("suggest user ")
-        print(request.user.user_id)
-        print(request.token)
         inner_qs = UserFollower.objects.filter(user = request.user.user_id).values('follower')
         suggestions = User.objects.exclude(user_id__in=inner_qs).all()
-        print(suggestions)
         suggestions1 = User.objects.exclude(user_id__in=inner_qs)
-        print("query is")
-        print(suggestions1.query)
 
         if suggestions:
             result = []
