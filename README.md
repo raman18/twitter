@@ -1,4 +1,4 @@
-# twitter
+twitter
 Features Covered
   1. Ability to post an update of max length 140 characters
   2. Ability to follow anyone
@@ -12,7 +12,7 @@ Configurations for running the app:
   2. mysql server 8.0.28.0
 
 After fetching project make virtualenv inside twitter directory
-    $ pip install virtualenv
+    $ pip install virtualenv \n
     $ virtualenv virtualenv_name*
 
 Now to activate virtual env
