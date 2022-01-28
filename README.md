@@ -12,23 +12,22 @@ Configurations for running the app:
   2. mysql server 8.0.28.0
 
 After fetching project make virtualenv inside twitter directory
-    # pip install virtualenv
-    # virtualenv virtualenv_name*
+    $ pip install virtualenv
+    $ virtualenv virtualenv_name*
 
 Now to activate virtual env
   For Windows
-    # virtualenv_name*\Scripts\activate
+    $ virtualenv_name*\Scripts\activate
   For Linux
      source virtualenv_name*/bin/activate
 Now we need to run the requirements.txt file, this will provide the required libraries for the app.
-  # pip install -r requirements.txt
+  $ pip install -r requirements.txt
   
 Now we can create our database using command
-  # python manage.py migrate
-  
+   python manage.py migrate  
   
 After executing requirements.txt file you can start application by
-  # python manage.py runserver
+  $ python manage.py runserver
 
 Defualt values are provided but you can change some details, for example you can change database name or instead of MySQL you can use other database.
 
@@ -39,6 +38,7 @@ List of APIs:
   4. Get followers post.
   5. Login/Logout.
   
-Apis specs are provided in json formatt in postman_collectio.json file.
+Apis specs are provided in json format in postman_collectio.json file.
+After creating user we get an access-token, which will be used as Authorization-header for the api calls except login api.
 
 
