@@ -20,18 +20,23 @@ After fetching project make virtualenv inside twitter directory
 Now to activate virtual env
   
   For Windows
+    
     $ virtualenv_name*\Scripts\activate
   
   For Linux
-     source virtualenv_name*/bin/activate
+   
+   $ source virtualenv_name*/bin/activate
 
 Now we need to run the requirements.txt file, this will provide the required libraries for the app.
+  
   $ pip install -r requirements.txt
   
 Now we can create our database using command
+  
   $ python manage.py migrate  
   
 After executing requirements.txt file you can start application by
+  
   $ python manage.py runserver
 
 Defualt values are provided but you can change some details, for example you can change database name or instead of MySQL you can use other database.
