@@ -14,7 +14,15 @@ class UserPostView(BaseView):
     @require_auth
     def post(self, request):
         json_data = json.loads(request.body)
-        
+
+        if not "content" in json_data:
+            return self.build_response(
+            None,
+            code=422,
+            message="Content is required.",
+            localized_message=_("UNPROCESSABLE_ENTITY"),
+        )
+
         if(len(json_data["content"]) == 0):
             return self.build_response(
             None,

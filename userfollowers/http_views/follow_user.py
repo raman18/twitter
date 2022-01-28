@@ -12,6 +12,15 @@ class FollowUserView(BaseView):
     @require_auth
     def post(self, request):
         json_data = json.loads(request.body)
+        
+        if not json_data["follower"]:
+            return self.build_response(
+                None,
+                code=422,
+                message="Data insufficient.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
         if request.user.user_id == int(json_data["follower"]):
             return self.build_response(
                 None,

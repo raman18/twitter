@@ -19,7 +19,23 @@ class LoginLogout(BaseView):
     def post(self, request):
         logger.info("Handling login call.")
         json_data = json.loads(request.body)
-    
+
+        if not "username" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Username is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if not "password" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Password is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+
         user = User.objects.filter(username=json_data["username"]).first()
         if not user:
             return self.build_response(
@@ -38,7 +54,7 @@ class LoginLogout(BaseView):
                 return self.build_response(
                     result,
                     code=200,
-                    message="User logged in.",
+                    message="You are logged in successfully.",
                     localized_message=_("LOGIN_OK"),
                 )
             else:
@@ -59,6 +75,6 @@ class LoginLogout(BaseView):
         return self.build_response(
             None, 
             code=200, 
-            message="OK", 
+            message="You are logged out successfully.", 
             localized_message=_("LOGOUT_OK")
         )

@@ -14,6 +14,38 @@ class RegisterUser(BaseView):
     def post(self, request):
         json_data = json.loads(request.body)
 
+        if not "name" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Name is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if not "email" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Email is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if not "username" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Username is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if not "password" in json_data:
+            return self.build_response(
+                None,
+                code=422,
+                message="Password is required.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+
         json_data["username"].replace(" ", "")
         
         if(len(json_data["username"]) > 20):
@@ -47,8 +79,40 @@ class RegisterUser(BaseView):
                 message="Choose a password of length 5 to 20.",
                 localized_message=_("UNPROCESSABLE_ENTITY"),
             )
+        
+        if(len(json_data["name"]) > 50):
+            return self.build_response(
+                None,
+                code=422,
+                message="Choose a name of length 5 to 20.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if(len(json_data["name"]) < 5):
+            return self.build_response(
+                None,
+                code=422,
+                message="Choose a name of length 5 to 50.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
 
-        username_exists = User.objects.filter(email=json_data["username"])
+        if(len(json_data["email"]) > 20):
+            return self.build_response(
+                None,
+                code=422,
+                message="Choose a email of length 5 to 50.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+        
+        if(len(json_data["email"]) < 5):
+            return self.build_response(
+                None,
+                code=422,
+                message="Choose a email of length 5 to 20.",
+                localized_message=_("UNPROCESSABLE_ENTITY"),
+            )
+
+        username_exists = User.objects.filter(username=json_data["username"])
         if username_exists:
             return self.build_response(
                 None,
