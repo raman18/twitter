@@ -1,4 +1,5 @@
-twitter
+Twitter
+
 Features Covered
   1. Ability to post an update of max length 140 characters
   2. Ability to follow anyone
