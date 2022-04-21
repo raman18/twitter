@@ -49,7 +49,7 @@ List of APIs:
   4. Get followers post.
   5. Login/Logout.
   
-Apis specs are provided in json format in postman_collectio.json file.
+Apis specs are provided in json format in postman_collection.json file.
 After creating user we get an access-token, which will be used as Authorization-header for the api calls except login api.
 
 
